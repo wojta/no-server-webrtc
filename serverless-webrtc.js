@@ -23,7 +23,8 @@ var dataChannelSettings = {
 var pcSettings = [
     {
         iceServers: [//{url:'stun:stun.l.google.com:19302'}]
-            {url: 'stun:atlantis.sazel.cz:3478'}]
+            {urls: 'stun:atlantis.sazel.cz:3478'}],
+        iceTransports: 'all'
     },
     {
         'optional': [{DtlsSrtpKeyAgreement: false}]
