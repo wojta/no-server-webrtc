@@ -52,13 +52,13 @@ function doHandleError(error) {
 }
 
 function onsignalingstatechange(state) {
-    //console.info('signaling state change:', state);
+    console.info('signaling state change:', state);
 }
 function oniceconnectionstatechange(state) {
-    //console.info('ice connection state change:', state);
+    console.info('ice connection state change:', state);
 }
 function onicegatheringstatechange(state) {
-    //console.info('ice gathering state change:', state);
+    console.info('ice gathering state change:', state);
 }
 
 function inputLoop(channel) {
