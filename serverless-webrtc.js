@@ -22,9 +22,8 @@ var dataChannelSettings = {
 
 var pcSettings = [
     {
-        iceServers: [//{url:'stun:stun.l.google.com:19302'}]
-            {urls: 'stun:atlantis.sazel.cz:3478'}],
-        iceTransports: 'all'
+        'iceServers': [{url: 'stun:stun.l.google.com:19302'}]
+        //{'url': 'stun:atlantis.sazel.cz:3478'}]
     },
     {
         'optional': [{DtlsSrtpKeyAgreement: false}]
@@ -53,13 +52,13 @@ function doHandleError(error) {
 }
 
 function onsignalingstatechange(state) {
-    console.info('signaling state change:', state);
+    console.info('signaling state change:', pc.signalingState);
 }
 function oniceconnectionstatechange(state) {
-    console.info('ice connection state change:', state);
+    console.info('ice connection state change:', pc.iceConnectionState);
 }
 function onicegatheringstatechange(state) {
-    console.info('ice gathering state change:', state);
+    console.info('ice gathering state change:', pc.iceGatheringState);
 }
 
 function inputLoop(channel) {
