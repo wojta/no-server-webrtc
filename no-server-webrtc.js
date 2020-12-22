@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-// This script runs under node, and `serverless-webrtc.html` runs inside
+// This script runs under node, and `no-server-webrtc.html` runs inside
 // a browser.
-// Usage: `node serverless-webrtc.js` or `node serverless-webrtc.js --create`.
+// Usage: `node no-server-webrtc.js` or `node no-server-webrtc.js --create`.
 var webrtc = require('wrtc');
 var readline = require('readline');
 var ansi = require('ansi');
