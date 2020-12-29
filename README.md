@@ -16,7 +16,7 @@ This repository contains two different clients that can talk to each other:
 Chat is fully interoperable between all of the above (Node, Chrome, Firefox)
 in any combination (tested with Chrome 35 and Firefox 29).
 
-![screenshot](https://raw.github.com/wojta/no-server-webrtc/master/serverless-webrtc.png)
+![screenshot](https://raw.github.com/wojta/no-server-webrtc/master/no-server-webrtc.png)
 
 ### For Node:
 

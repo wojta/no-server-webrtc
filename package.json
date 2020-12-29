@@ -6,8 +6,8 @@
   "license": "MIT",
   "main": "no-server-webrtc.js",
   "dependencies": {
-    "wrtc": "~0.0.29",
-    "ansi": "0.3.0"
+    "wrtc": "0.4.6",
+    "ansi": "0.3.1"
   },
   "repository": {
     "type": "git",
