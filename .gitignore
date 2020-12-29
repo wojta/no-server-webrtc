@@ -42,6 +42,8 @@ atlassian-ide-plugin.xml
 # node_modules
 node_modules
 
+.vscode
+
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
 crashlytics.properties
