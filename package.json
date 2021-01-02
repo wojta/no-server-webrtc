@@ -1,7 +1,7 @@
 {
   "name": "no-server-webrtc",
   "version": "1.1.0",
-  "description": "A terminal text chat client for webrtc datachannels between node and browsers. Originally based upon https://github.com/cjb/no-server-webrtc with minor changes.",
+  "description": "A terminal text chat client for webrtc datachannels between node and browsers. Originally based upon https://github.com/cjb/serverless-webrtc with minor changes.",
   "author": "Chris Ball <chris@printf.net> (http://printf.net/).",
   "license": "MIT",
   "main": "no-server-webrtc.js",

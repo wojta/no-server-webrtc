@@ -1,7 +1,7 @@
 no-server-webrtc
 =================
 
-Originally based upon https://github.com/cjb/no-server-webrtc with minor changes. Renamed to avoid confusion with the so-called [serverless computing](https://en.wikipedia.org/wiki/Serverless_computing).
+Originally based upon https://github.com/cjb/serverless-webrtc with minor changes. Renamed to avoid confusion with the so-called [serverless computing](https://en.wikipedia.org/wiki/Serverless_computing).
 
 This is a tech demo of using WebRTC without a signaling server -- the 
 WebRTC offer/answer exchange is performed manually by the users, for example
