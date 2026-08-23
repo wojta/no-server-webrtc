@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8">
     <title>WebRTC p2p data</title>
-    <script src="js/adapter.js"></script>
     <script src="js/jquery-2.0.0.js"></script>
     <script src="js/bootstrap.js"></script>
     <link href="css/bootstrap.css" rel="stylesheet">
@@ -12,12 +11,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
 </head>
 <body>
-<a class="github-fork-ribbon" href="https://github.com/cjb/no-server-webrtc/" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+<a class="github-fork-ribbon" href="https://github.com/wojta/no-server-webrtc/" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
 <div class="span4">
-  <Video id="localVideo">
+  <video id="localVideo"></video>
 </div>
 <div class="span4">
-  <Video id="remoteVideo">
+  <video id="remoteVideo"></video>
 </div>
 <div class="span4">
   <fieldset class="well">
@@ -27,16 +26,16 @@
     <div class="text-info" id="chatlog" style="height:350px; overflow:auto;">
     </div>
   </fieldset>
-  <form class="form-inline" onSubmit="return sendMessage()" action="">
+  <form class="form-inline" onsubmit="return sendMessage()" action="">
     <input type="text" id="messageTextBox" placeholder="Type your message here">
     <button type="submit" id="sendMessageBtn" class="btn">Send message</button>
   </form>
   <input type="file" id="fileBtn">
 </div>
 
-<div class="modal" id="showLocalOffer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" hidden>
+<div class="modal" id="showLocalOffer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="showLocalOfferLabel" aria-hidden="true" hidden>
   <div class="modal-header">
-    <h3 id="myModalLabel">Send your local offer to someone else</h3>
+    <h3 id="showLocalOfferLabel">Send your local offer to someone else</h3>
   </div>
   <div class="modal-body">
     Here's your "offer" -- it tells someone else how to connect to you.  Send the whole thing to them, for example in an instant message or e-mail.
@@ -48,9 +47,9 @@
   </div>
 </div>
 
-<div class="modal" id="showLocalAnswer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" hidden>
+<div class="modal" id="showLocalAnswer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="showLocalAnswerLabel" aria-hidden="true" hidden>
   <div class="modal-header">
-    <h3 id="myModalLabel">Send your local answer to someone else</h3>
+    <h3 id="showLocalAnswerLabel">Send your local answer to someone else</h3>
   </div>
   <div class="modal-body">
     Here's your "answer" -- it tells someone else how to connect to you.  Send the whole thing to them, for example in an instant message or e-mail.
@@ -62,9 +61,9 @@
   </div>
 </div>
 
-<div class="modal" id="getRemoteOffer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" hidden>
+<div class="modal" id="getRemoteOffer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="getRemoteOfferLabel" aria-hidden="true" hidden>
   <div class="modal-header">
-    <h3 id="myModalLabel">Paste the "offer" you received</h3>
+    <h3 id="getRemoteOfferLabel">Paste the "offer" you received</h3>
   </div>
   <div class="modal-body">
     The person who created the room will send you an "offer" string -- paste it here.
@@ -76,9 +75,9 @@
   </div>
 </div>
 
-<div class="modal" id="getRemoteAnswer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" hidden>
+<div class="modal" id="getRemoteAnswer" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="getRemoteAnswerLabel" aria-hidden="true" hidden>
   <div class="modal-header">
-    <h3 id="myModalLabel">Paste the "answer" you received</h3>
+    <h3 id="getRemoteAnswerLabel">Paste the "answer" you received</h3>
   </div>
   <div class="modal-body">
     Now paste in the "answer" that was sent back to you.
@@ -90,21 +89,21 @@
   </div>
 </div>
 
-<div class="modal" id="waitForConnection" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" hidden>
+<div class="modal" id="waitForConnection" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="waitForConnectionLabel" aria-hidden="true" hidden>
   <div class="modal-header">
-    <h3 id="myModalLabel">Waiting for connection</h3>
+    <h3 id="waitForConnectionLabel">Waiting for connection</h3>
   </div>
   <div class="modal-body">
     This dialog will disappear when a connection is made.
   </div>
-  <div class="spinner" align="center">
-    <img src="img/spinner.gif"></img>
+  <div class="spinner" style="text-align:center">
+    <img src="img/spinner.gif" alt="Connecting…">
   </div>
 </div>
 
-<div class="modal" id="createOrJoin" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal" id="createOrJoin" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="createOrJoinLabel" aria-hidden="true">
   <div class="modal-header">
-    <h3 id="myModalLabel">Create or join a room?</h3>
+    <h3 id="createOrJoinLabel">Create or join a room?</h3>
   </div>
   <div class="modal-footer">
     <button class="btn" id="joinBtn" data-dismiss="modal" aria-hidden="true">Join</button>

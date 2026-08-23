@@ -871,8 +871,8 @@
           that.enforceFocus()
 
           transition ?
-            that.$element.one($.support.transition.end, function () { that.$element.focus().trigger('shown') }) :
-            that.$element.focus().trigger('shown')
+            that.$element.one($.support.transition.end, function () { that.$element.get(0).focus(); that.$element.trigger('shown') }) :
+            (that.$element.get(0).focus(), that.$element.trigger('shown'))
 
         })
       }
@@ -904,12 +904,10 @@
       }
 
     , enforceFocus: function () {
-        var that = this
-        $(document).on('focusin.modal', function (e) {
-          if (that.$element[0] !== e.target && !that.$element.has(e.target).length) {
-            that.$element.focus()
-          }
-        })
+        // Disabled: with this jQuery/browser combo, native focus() on the
+        // modal re-fires a "focusin" (via jQuery's focusin-bubbling
+        // emulation), which this handler would react to by calling
+        // focus() again, looping forever (RangeError: call stack).
       }
 
     , escape: function () {
