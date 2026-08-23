@@ -3,7 +3,7 @@
 // This script runs under node, and `no-server-webrtc.html` runs inside
 // a browser.
 // Usage: `node no-server-webrtc.js` or `node no-server-webrtc.js --create`.
-var webrtc = require("wrtc");
+var webrtc = require("@roamhq/wrtc");
 var readline = require("readline");
 var ansi = require("ansi");
 const { exit } = require("process");
@@ -81,7 +81,7 @@ function inputLoop(channel) {
 /* 2. This code deals with the --join case. */
 
 function getOffer(pastedOffer) {
-  data = JSON.parse(pastedOffer);
+  data = JSON.parse(pastedOffer.trim());
   offer = new webrtc.RTCSessionDescription(data);
   answer = null;
 
@@ -133,7 +133,7 @@ function doHandleDataChannels() {
       }
     };
     channel.onmessage = function (evt) {
-      data = JSON.parse(evt.data);
+      data = JSON.parse(evt.data.trim());
       cursor.blue();
       console.log(data.message);
       inputLoop(channel);
@@ -194,7 +194,7 @@ function makeDataChannel() {
 }
 
 function getAnswer(pastedAnswer) {
-  data = JSON.parse(pastedAnswer);
+  data = JSON.parse(pastedAnswer.trim());
   answer = new webrtc.RTCSessionDescription(data);
   return pc.setRemoteDescription(answer).catch(doHandleError);
 }
