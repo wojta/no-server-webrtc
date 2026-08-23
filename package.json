@@ -3,6 +3,10 @@
   "version": "1.2.0",
   "description": "A terminal text chat client for webrtc datachannels between node and browsers. Originally based upon https://github.com/cjb/serverless-webrtc with minor changes.",
   "author": "Chris Ball <chris@printf.net> (http://printf.net/).",
+  "contributors": [
+    "Vojtěch Sázel",
+    "Z1kmund Lucemburský <z1kmund@nst.cloud>"
+  ],
   "license": "MIT",
   "main": "no-server-webrtc.js",
   "engines": {
