@@ -5,12 +5,19 @@
     https://webrtc-demos.appspot.com/html/pc1.html
 */
 
-var cfg = {'iceServers': [{'url': 'stun:23.21.150.121'}]},
-  con = { 'optional': [{'DtlsSrtpKeyAgreement': true}] }
+var cfg = {
+  iceServers: [
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' }
+  ]
+}
 
 /* THIS IS ALICE, THE CALLER/SENDER */
 
-var pc1 = new RTCPeerConnection(cfg, con),
+var pc1 = new RTCPeerConnection(cfg),
   dc1 = null, tn1 = null
 
 // Since the same JS file contains code for both sides of the connection,
@@ -19,12 +26,16 @@ var activedc
 
 var pc1icedone = false
 
-var sdpConstraints = {
-  optional: [],
-  mandatory: {
-    OfferToReceiveAudio: true,
-    OfferToReceiveVideo: true
+// Camera/mic are optional -- the app is fully usable as a text-only chat
+// even when getUserMedia is unavailable or denied.
+function requestLocalMedia () {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    return Promise.resolve(null)
   }
+  return navigator.mediaDevices.getUserMedia({video: true, audio: true}).catch(function (error) {
+    console.log('Could not get local media, continuing without it: ' + error)
+    return null
+  })
 }
 
 $('#showLocalOffer').modal('hide')
@@ -38,17 +49,13 @@ $('#createBtn').click(function () {
 })
 
 $('#joinBtn').click(function () {
-  navigator.getUserMedia = navigator.getUserMedia ||
-                           navigator.webkitGetUserMedia ||
-                           navigator.mozGetUserMedia ||
-                           navigator.msGetUserMedia
-  navigator.getUserMedia({video: true, audio: true}, function (stream) {
-    var video = document.getElementById('localVideo')
-    video.src = window.URL.createObjectURL(stream)
-    video.play()
-    pc2.addStream(stream)
-  }, function (error) {
-    console.log('Error adding stream to pc2: ' + error)
+  requestLocalMedia().then(function (stream) {
+    if (stream) {
+      var video = document.getElementById('localVideo')
+      video.srcObject = stream
+      video.play()
+      stream.getTracks().forEach(function (track) { pc2.addTrack(track, stream) })
+    }
   })
   $('#getRemoteOffer').modal('show')
 })
@@ -116,17 +123,22 @@ function sendMessage () {
   return false
 }
 
+function onDataChannelOpen () {
+  console.log('data channel connect')
+  $('#waitForConnection').modal('hide')
+  $('#waitForConnection').remove()
+  $('#showLocalAnswer').modal('hide')
+  $('#messageTextBox').focus()
+  writeToChatLog('Datachannel connected', 'text-success')
+}
+
 function setupDC1 () {
   try {
     var fileReceiver1 = new FileReceiver()
     dc1 = pc1.createDataChannel('test', {reliable: true})
     activedc = dc1
     console.log('Created datachannel (pc1)')
-    dc1.onopen = function (e) {
-      console.log('data channel connect')
-      $('#waitForConnection').modal('hide')
-      $('#waitForConnection').remove()
-    }
+    dc1.onopen = onDataChannelOpen
     dc1.onmessage = function (e) {
       console.log('Got message (pc1)', e.data)
       if (e.data.size) {
@@ -154,26 +166,22 @@ function setupDC1 () {
 
 function createLocalOffer () {
   console.log('video1')
-  navigator.getUserMedia = navigator.getUserMedia ||
-                           navigator.webkitGetUserMedia ||
-                           navigator.mediaDevices.getUserMedia ||
-                           navigator.msGetUserMedia
-  navigator.getUserMedia({video: true, audio: true}, function (stream) {
-    var video = document.getElementById('localVideo')
-    video.src = window.URL.createObjectURL(stream)
-    video.play()
-    pc1.addStream(stream)
-    console.log(stream)
-    console.log('adding stream to pc1')
+  requestLocalMedia().then(function (stream) {
+    if (stream) {
+      var video = document.getElementById('localVideo')
+      video.srcObject = stream
+      video.play()
+      stream.getTracks().forEach(function (track) { pc1.addTrack(track, stream) })
+      console.log('adding stream to pc1')
+    }
     setupDC1()
-    pc1.createOffer(function (desc) {
-      pc1.setLocalDescription(desc, function () {}, function () {})
-      console.log('created local offer', desc)
-    },
-    function () { console.warn("Couldn't create offer") },
-    sdpConstraints)
-  }, function (error) {
-    console.log('Error adding stream to pc1: ' + error)
+    return pc1.createOffer()
+  }).then(function (desc) {
+    return pc1.setLocalDescription(desc)
+  }).then(function () {
+    console.log('created local offer', pc1.localDescription)
+  }).catch(function (err) {
+    console.warn("Couldn't create offer", err)
   })
 }
 
@@ -184,28 +192,14 @@ pc1.onicecandidate = function (e) {
   }
 }
 
-function handleOnaddstream (e) {
-  console.log('Got remote stream', e.stream)
+function handleOnTrack (e) {
+  console.log('Got remote track', e)
   var el = document.getElementById('remoteVideo')
   el.autoplay = true
-  attachMediaStream(el, e.stream)
+  el.srcObject = e.streams[0]
 }
 
-pc1.onaddstream = handleOnaddstream
-
-function handleOnconnection () {
-  console.log('Datachannel connected')
-  writeToChatLog('Datachannel connected', 'text-success')
-  $('#waitForConnection').modal('hide')
-  // If we didn't call remove() here, there would be a race on pc2:
-  //   - first onconnection() hides the dialog, then someone clicks
-  //     on answerSentBtn which shows it, and it stays shown forever.
-  $('#waitForConnection').remove()
-  $('#showLocalAnswer').modal('hide')
-  $('#messageTextBox').focus()
-}
-
-pc1.onconnection = handleOnconnection
+pc1.ontrack = handleOnTrack
 
 function onsignalingstatechange (state) {
   console.info('signaling state change:', state)
@@ -235,7 +229,7 @@ function handleCandidateFromPC2 (iceCandidate) {
 
 /* THIS IS BOB, THE ANSWERER/RECEIVER */
 
-var pc2 = new RTCPeerConnection(cfg, con),
+var pc2 = new RTCPeerConnection(cfg),
   dc2 = null
 
 var pc2icedone = false
@@ -246,11 +240,7 @@ pc2.ondatachannel = function (e) {
   console.log('Received datachannel (pc2)', arguments)
   dc2 = datachannel
   activedc = dc2
-  dc2.onopen = function (e) {
-    console.log('data channel connect')
-    $('#waitForConnection').modal('hide')
-    $('#waitForConnection').remove()
-  }
+  dc2.onopen = onDataChannelOpen
   dc2.onmessage = function (e) {
     console.log('Got message (pc2)', e.data)
     if (e.data.size) {
@@ -269,14 +259,15 @@ pc2.ondatachannel = function (e) {
 }
 
 function handleOfferFromPC1 (offerDesc) {
-  pc2.setRemoteDescription(offerDesc)
-  pc2.createAnswer(function (answerDesc) {
+  pc2.setRemoteDescription(offerDesc).then(function () {
+    return pc2.createAnswer()
+  }).then(function (answerDesc) {
     writeToChatLog('Created local answer', 'text-success')
     console.log('Created local answer: ', answerDesc)
-    pc2.setLocalDescription(answerDesc)
-  },
-  function () { console.warn("Couldn't create offer") },
-  sdpConstraints)
+    return pc2.setLocalDescription(answerDesc)
+  }).catch(function (err) {
+    console.warn("Couldn't create answer", err)
+  })
 }
 
 pc2.onicecandidate = function (e) {
@@ -294,8 +285,7 @@ function handleCandidateFromPC1 (iceCandidate) {
   pc2.addIceCandidate(iceCandidate)
 }
 
-pc2.onaddstream = handleOnaddstream
-pc2.onconnection = handleOnconnection
+pc2.ontrack = handleOnTrack
 
 function getTimestamp () {
   var totalSec = new Date().getTime() / 1000
