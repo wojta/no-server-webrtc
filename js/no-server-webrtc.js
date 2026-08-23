@@ -301,5 +301,8 @@ function getTimestamp () {
 }
 
 function writeToChatLog (message, message_type) {
-  document.getElementById('chatlog').innerHTML += '<p class="' + message_type + '">' + '[' + getTimestamp() + '] ' + message + '</p>'
+  var p = document.createElement('p')
+  p.className = message_type
+  p.textContent = '[' + getTimestamp() + '] ' + message
+  document.getElementById('chatlog').appendChild(p)
 }
